@@ -1,7 +1,7 @@
 import subprocess
 import pandas as pd
 from io import StringIO
-from common_utils import run_shell_command
+from src.utils.common_utils import run_shell_command
 
 
 def get_exclusion_directories():

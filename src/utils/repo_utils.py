@@ -1,5 +1,6 @@
 import subprocess
-from common_utils import HUGGING_FACE_HOST_URL
+import platform
+from src.utils.common_utils import HUGGING_FACE_HOST_URL
 
 
 def git_clone(repo_id):
@@ -12,6 +13,9 @@ def git_clone(repo_id):
 
 def delete_directory(folder):
     try:
-        subprocess.run(['rm', f'{folder}/', '-R'], check=True)
+        if platform.system() == 'Linux':
+            subprocess.run(['rm', f'{folder}/', '-R'], check=True)
+        elif platform.system() == 'Windows':
+            subprocess.run(['rd', '/s', '/q', f'{folder}'], check=True)
     except subprocess.CalledProcessError as err:
         print(f'Returned: {err.returncode}. Failed to delete directory: {folder}/')
