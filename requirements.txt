@@ -2,3 +2,4 @@ huggingface-hub==0.19.4
 lizard==1.17.10
 numpy
 pandas
+matplotlib
