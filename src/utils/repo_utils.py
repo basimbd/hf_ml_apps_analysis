@@ -13,7 +13,7 @@ def git_clone(repo_id):
 
 def delete_directory(folder):
     try:
-        if platform.system() == 'Linux':
+        if platform.system() in ['Linux', 'Darwin']:
             subprocess.run(['rm', f'{folder}/', '-rf'], check=True)
         elif platform.system() == 'Windows':
             subprocess.run(['rd', '/s', '/q', f'{folder}'], check=True)
