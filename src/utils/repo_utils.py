@@ -6,6 +6,7 @@ from src.utils.common_utils import HUGGING_FACE_HOST_URL
 def git_clone(repo_id):
     repo_url = HUGGING_FACE_HOST_URL+f'/spaces/{repo_id}'
     try:
+        # The GIT_LFS_SKIP_SMUDGE=1 is used so that large files are efficiently handled during the cloning.
         subprocess.run(f'GIT_LFS_SKIP_SMUDGE=1 git clone --quiet --filter=blob:limit=1m {repo_url}', shell=True, check=True)
     except subprocess.CalledProcessError as err:
         print(f'Returned: {err.returncode}. Failed to clone repo: {repo_url}')

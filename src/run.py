@@ -12,6 +12,12 @@ makedirs(f"{PROJECT_DIR}/output")
 
 
 def get_spaces_df(model_type: str):
+    """
+    Given a model type (text-classification or text-generation) as a parameter,
+    fetches all the spaces using that model_type and saves to a CSV file.
+    :param model_type:
+    :return a DataFrame of spaces using model_type:
+    """
     model_list = model_utils.get_model_list(model_type)
     spaces_df = space_utils.get_all_spaces(model_list)
     print(f"==========Total {model_type} spaces: {spaces_df.shape[0]}==========")
@@ -20,6 +26,13 @@ def get_spaces_df(model_type: str):
 
 
 def get_spaces_and_their_sizes(model_type: str, spaces_df: pd.DataFrame = None):
+    """
+    Given a model_type, and the spaces using that model, this function returns the code size
+    i.e., Non-comment Lines of Code (NLOC) count.
+    :param model_type:
+    :param spaces_df:
+    :return a dictionary where the keys are the space repo_id, and the value is the NLOC count:
+    """
     if spaces_df is None:
         spaces_df = get_spaces_df(model_type)
     spaces_size_dict = space_utils.save_and_get_spaces_sizes(list(spaces_df.values), model_type)
@@ -30,7 +43,9 @@ def get_spaces_and_their_sizes(model_type: str, spaces_df: pd.DataFrame = None):
     return spaces_size_dict
 
 
+# Fetch and save all spaces and their code size.
 tc_spaces_size_dict = get_spaces_and_their_sizes("text-classification")
 tg_spaces_size_dict = get_spaces_and_their_sizes("text-generation")
+# Draw and save charts based on the above fetched data.
 charts_drawer.draw_space_comparison_box()
 charts_drawer.draw_nloc_comparison_bar_chart()

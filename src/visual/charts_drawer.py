@@ -8,14 +8,17 @@ from src.utils.common_utils import PROJECT_DIR
 
 def draw_space_comparison_box():
     try:
+        # These files should be available if the fetching of the spaces was successful.
         tc_spaces_df = pd.read_csv(f"{PROJECT_DIR}/output/text-classification-spaces.csv")
         tg_spaces_df = pd.read_csv(f"{PROJECT_DIR}/output/text-generation-spaces.csv")
     except FileNotFoundError as err:
         logging.exception(f"File {err.filename} not found.")
         return
 
+    # Find the spaces that are common in both Text Classification and Text Generation
     common_spaces_df = tc_spaces_df.loc[tc_spaces_df['id'].isin(tg_spaces_df['id']), :]
 
+    # Get the number of spaces of each type
     tc_spaces = tc_spaces_df.shape[0]
     tg_spaces = tg_spaces_df.shape[0]
     overlap_spaces = common_spaces_df.shape[0]
@@ -43,12 +46,16 @@ def draw_space_comparison_box():
 
 def draw_nloc_comparison_bar_chart():
     try:
+        # These files should be available if the lizard analysis of the spaces was successful.
         tc_size_df = pd.read_csv(f"{PROJECT_DIR}/output/text-classification-space-sizes.csv")
         tg_size_df = pd.read_csv(f"{PROJECT_DIR}/output/text-generation-space-sizes.csv")
     except FileNotFoundError as err:
         logging.exception(f"File {err.filename} not found.")
         return
 
+    # a key-value result,
+    # key: space size (NLOC count) range (for example 0-100).
+    # value: percent of spaces falling in that range.
     space_size_percentage_chart_df = get_space_size_percentage_by_nloc_range(tc_size_df, tg_size_df)
 
     ranges = list(space_size_percentage_chart_df["nloc_range"])
@@ -59,8 +66,8 @@ def draw_nloc_comparison_bar_chart():
 
     x_axis = np.arange(len(ranges))
 
-    plt.bar(x_axis - 0.4, tc_space_counts, label = 'Text Classification', align='edge', width=0.4)
-    plt.bar(x_axis, tg_space_counts, label = 'Text Generation', align='edge', width=0.4)
+    plt.bar(x_axis - 0.4, tc_space_counts, label='Text Classification', align='edge', width=0.4)
+    plt.bar(x_axis, tg_space_counts, label='Text Generation', align='edge', width=0.4)
 
     plt.xticks(x_axis, ranges, rotation=90)
     plt.xlabel("Ranges of Lines of Codes")
@@ -81,7 +88,10 @@ def get_space_size_percentage_by_nloc_range(tc_size_df: pd.DataFrame, tg_size_df
     tg_percent_chart_df = pd.DataFrame(data={"nloc_range": tg_line_chart.keys(), "space_percents": tg_chart_percents})
 
     space_size_percent_chart_df = tg_percent_chart_df.merge(tc_percent_chart_df, on=["nloc_range"], how="outer", suffixes=("_tg", "_tc")).fillna(0)
+    # a bug in pandas merge changes the dtype of the dataframe. So changing it back to int.
     space_size_percent_chart_df['space_percents_tc'] = space_size_percent_chart_df['space_percents_tc'].astype(int)
+
+    # The query drops the rows if neither TC nor TG have any project in tha NLOC count range.
     return space_size_percent_chart_df.query("(space_percents_tc != 0) and (space_percents_tg != 0)")
 
 
@@ -90,7 +100,7 @@ def find_space_counts_per_nloc_range(tc_size_df: pd.DataFrame, tg_size_df: pd.Da
     tc_line_chart = {}
     tg_line_chart = {}
 
-    max_size = find_min_max(tc_size_df, tg_size_df)
+    max_size = find_max(tc_size_df, tg_size_df)
 
     interval_start = 0
     while interval_start < (max_size+1):
@@ -120,7 +130,8 @@ def find_space_counts_per_nloc_range(tc_size_df: pd.DataFrame, tg_size_df: pd.Da
     return tc_line_chart, tg_line_chart
 
 
-def find_min_max(tc_size_df: pd.DataFrame, tg_size_df: pd.DataFrame):
+def find_max(tc_size_df: pd.DataFrame, tg_size_df: pd.DataFrame):
+    # Find the 95th Percentile NLOC count and treat it as max. Actual maximum is not used to avoid using outliers.
     tc_size_df = tc_size_df[tc_size_df['size'] != 0]
     tg_size_df = tg_size_df[tg_size_df['size'] != 0]
 
