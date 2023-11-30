@@ -1,9 +1,8 @@
 import huggingface_hub as hf
 import pandas as pd
-
-from src.utils import repo_utils
-from src.utils.common_utils import run_shell_command
-from src.utils.lizard_utils import get_nloc_count
+from utils.repo_utils import git_clone, delete_directory
+from utils.common_utils import run_shell_command, dict_to_csv, PROJECT_DIR
+from utils.lizard_utils import get_nloc_count
 
 
 def get_space_info_fields_as_list():
@@ -35,9 +34,24 @@ def get_spaces_sizes(space_list):
             continue
 
         repo_folder = repo_id.replace(f'{author}/', '', 1)
-        repo_utils.git_clone(repo_id)
+        git_clone(repo_id)
 
         # only take repo that have more than 1 commit.
         if int(run_shell_command(f'cd {repo_folder} && git rev-list --count main')) > 1:
             space_size_dict[repo_id] = get_nloc_count(repo_folder)
-        repo_utils.delete_directory(repo_folder)
+        delete_directory(repo_folder)
+    return space_size_dict
+
+
+def save_and_get_spaces_sizes(space_list: list, model_type: str):
+    SLICE_SIZE = 100
+    slicer_position = 0
+
+    space_size_dict = {}
+
+    while slicer_position <= len(space_list):
+        temp_dict = get_spaces_sizes(space_list[slicer_position:(slicer_position+SLICE_SIZE)])
+        space_size_dict.update(temp_dict)
+        dict_to_csv(space_size_dict, f"{PROJECT_DIR}/output/{model_type}-space-sizes.csv")
+        slicer_position += SLICE_SIZE
+    return space_size_dict
