@@ -64,6 +64,7 @@ for both Text Classification and Text Generation.
 | Number of Spaces    | 693                 | 2810            |
 | Analyzed Spaces     | 513                 | 1664            |
 | Avg. NLOC per Space | 729.42              | 30616.43        |
+
 Table 1: Analysis Data
 
 - These data can slightly change while running on different days depending on the
