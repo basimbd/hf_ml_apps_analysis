@@ -1,8 +1,8 @@
 import huggingface_hub as hf
 import pandas as pd
-from utils.repo_utils import git_clone, delete_directory
-from utils.common_utils import run_shell_command, dict_to_csv, PROJECT_DIR
-from utils.lizard_utils import get_nloc_count
+from src.utils.repo_utils import git_clone, delete_directory
+from src.utils.common_utils import run_shell_command, dict_to_csv, PROJECT_DIR
+from src.utils.lizard_utils import get_nloc_count
 
 
 def get_space_info_fields_as_list():

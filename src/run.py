@@ -1,11 +1,14 @@
-from utils.common_utils import PROJECT_DIR
-import utils.model_utils as model_utils
-import utils.space_utils as space_utils
+from src.utils.common_utils import PROJECT_DIR
+import src.utils.model_utils as model_utils
+import src.utils.space_utils as space_utils
 import pandas as pd
 from os import path, makedirs
+import shutil
+import src.visual.charts_drawer as charts_drawer
 
-if not path.exists(f"{PROJECT_DIR}/output"):
-    makedirs(f"{PROJECT_DIR}/output")
+if path.exists(f"{PROJECT_DIR}/output"):
+    shutil.rmtree(f"{PROJECT_DIR}/output")
+makedirs(f"{PROJECT_DIR}/output")
 
 
 def get_spaces_df(model_type: str):
@@ -29,3 +32,5 @@ def get_spaces_and_their_sizes(model_type: str, spaces_df: pd.DataFrame = None):
 
 tc_spaces_size_dict = get_spaces_and_their_sizes("text-classification")
 tg_spaces_size_dict = get_spaces_and_their_sizes("text-generation")
+charts_drawer.draw_space_comparison_box()
+charts_drawer.draw_nloc_comparison_bar_chart()

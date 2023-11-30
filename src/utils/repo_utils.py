@@ -1,6 +1,6 @@
 import subprocess
 import platform
-from utils.common_utils import HUGGING_FACE_HOST_URL
+from src.utils.common_utils import HUGGING_FACE_HOST_URL
 
 
 def git_clone(repo_id):
